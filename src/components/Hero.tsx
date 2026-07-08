@@ -38,7 +38,7 @@ const { address, balance, connect } = useWallet();
        <p>{balance} XLM</p>
       </div>
      )}
-     <SendForm />
+    <SendForm address={address} />
     </section>
   );
 }

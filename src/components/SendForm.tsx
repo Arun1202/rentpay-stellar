@@ -1,6 +1,16 @@
 import { useState } from "react";
 
-export default function SendForm() {
+import {
+  buildPaymentTransaction,
+  signPaymentTransaction,
+  submitSignedTransaction,
+} from "../services/transaction";
+
+export default function SendForm({
+  address,
+}: {
+  address: string;
+}) {
   const [receiver, setReceiver] = useState("");
   const [amount, setAmount] = useState("");
 
@@ -28,10 +38,15 @@ export default function SendForm() {
       />
 
       <button
-        className="bg-green-600 px-6 py-3 rounded text-white w-full"
-      >
-        Send XLM
-      </button>
+  onClick={async () => {
+    console.log("Sender:", address);
+    console.log("Receiver:", receiver);
+    console.log("Amount:", amount);
+  }}
+  className="bg-green-600 px-6 py-3 rounded text-white w-full"
+>
+  Send XLM
+</button>
 
     </div>
   );
