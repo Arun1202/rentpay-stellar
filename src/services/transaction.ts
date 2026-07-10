@@ -34,28 +34,43 @@ export async function buildPaymentTransaction(
       })
     )
     
-    .setTimeout(30)
+    .setTimeout(300)
     .build();
+    console.log("Transaction XDR:", transaction.toXDR());
 
 
   return transaction;
 }
-export async function signPaymentTransaction(transaction: any) {
-  const xdr = transaction.toXDR();
-
-  const signed = await signTransaction(xdr, {
+export async function signPaymentTransaction(
+  transaction: Transaction,
+  sourceAddress: string
+) {
+  const result = await signTransaction(transaction.toXDR(), {
     networkPassphrase: Networks.TESTNET,
+    address: sourceAddress,
   });
 
-  return signed;
+  console.log("Sign Result:", result);
+
+  if (result.error) {
+    throw new Error(JSON.stringify(result.error));
+  }
+
+  return result.signedTxXdr;
 }
-export async function submitSignedTransaction(signedXdr: string) {
-  const transaction = TransactionBuilder.fromXDR(
-    signedXdr,
+export async function submitSignedTransaction(signedTxXdr: string) {
+  const signedTransaction = TransactionBuilder.fromXDR(
+    signedTxXdr,
     Networks.TESTNET
   ) as Transaction;
 
-  const response = await server.submitTransaction(transaction);
+  try {
+    return await server.submitTransaction(signedTransaction);
+  } catch (err: any) {
+    console.log("========== HORIZON ERROR ==========");
+    console.log(JSON.stringify(err.response?.data, null, 2));
+    console.log("==================================");
 
-  return response;
+    throw err;
+  }
 }
