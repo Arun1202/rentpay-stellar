@@ -1,5 +1,8 @@
 import useWallet from "../hooks/useWallet";
 import SendForm from "./SendForm";
+import TransactionHistory from "./TransactionHistory";
+import StatsCard from "./StatsCard";
+import toast from "react-hot-toast";
 
 export default function Hero() {
 const { address, balance, connect } = useWallet();
@@ -28,17 +31,41 @@ const { address, balance, connect } = useWallet();
 </button>
 
       {address && (
-        <div className="mt-10 text-green-400">
-          {address}
-        </div>
-      )}
+  <div className="mt-10 w-full max-w-lg bg-slate-800 p-4 rounded-lg">
+    <p className="text-green-400 break-all">
+      {address}
+    </p>
+
+    <button
+      onClick={() => {
+        navigator.clipboard.writeText(address);
+        toast.success("Wallet Address Copied!");
+      }}
+      className="bg-blue-600 px-4 py-2 rounded text-white mt-3"
+    >
+      Copy Address
+    </button>
+  </div>
+)}
       {balance && (
      <div className="mt-6 bg-slate-800 p-4 rounded-lg text-white">
        <h2 className="font-bold">Balance</h2>
        <p>{balance} XLM</p>
       </div>
      )}
+     <div className="grid grid-cols-2 gap-4 mt-8 w-full max-w-lg">
+  <StatsCard
+    title="Balance"
+    value={`${balance} XLM`}
+  />
+
+  <StatsCard
+    title="Wallet"
+    value={`${address.slice(0, 6)}...${address.slice(-4)}`}
+  />
+</div>
     <SendForm address={address} />
+    <TransactionHistory address={address} />
     </section>
   );
 }
