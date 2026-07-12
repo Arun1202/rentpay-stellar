@@ -26,7 +26,7 @@ export default function SendForm({
 } | null>(null);
 
   return (
-    <div className="bg-slate-800 p-6 rounded-xl h-full">
+    <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-2xl h-full shadow-xl">
       <h2 className="text-2xl font-bold text-white mb-6">
         Send XLM
       </h2>
@@ -37,7 +37,7 @@ export default function SendForm({
         value={receiver}
         onChange={(e) => setReceiver(e.target.value)}
         disabled={loading}
-        className="w-full p-3 rounded mb-4"
+        className="w-full p-3 rounded-xl bg-slate-900 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 mb-4"
       />
 
       <input
@@ -46,12 +46,41 @@ export default function SendForm({
         value={amount}
         onChange={(e) => setAmount(e.target.value)}
         disabled={loading}
-        className="w-full p-3 rounded mb-4"
+        className="w-full p-3 rounded-xl bg-slate-900 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 mb-4"
       />
 
       <button
         disabled={loading}
         onClick={async () => {
+          // Wallet connected?
+if (!address) {
+  toast.error("Please connect your wallet first.");
+  return;
+}
+
+// Receiver empty?
+if (!receiver.trim()) {
+  toast.error("Receiver address is required.");
+  return;
+}
+
+// Amount empty?
+if (!amount.trim()) {
+  toast.error("Amount is required.");
+  return;
+}
+
+// Invalid amount?
+if (Number(amount) <= 0) {
+  toast.error("Enter a valid amount.");
+  return;
+}
+
+// Sender & receiver same?
+if (receiver === address) {
+  toast.error("You can't send XLM to your own wallet.");
+  return;
+}
           setLoading(true);
           setMessage("");
           if (!receiver.trim()) {
@@ -107,23 +136,39 @@ setAmount("");
 
             console.log(result);
           } catch (err: any) {
-            toast.error("Transaction Failed!");
-            setMessage("❌ Transaction Failed");
+  console.error(err);
 
-            console.error(err);
+  const errorMessage =
+    err?.message ||
+    err?.response?.data?.detail ||
+    "";
 
-            if (err.message) {
-              console.log("Message:", err.message);
-            }
-          } finally {
-            setLoading(false);
-          }
+  if (errorMessage.includes("rejected")) {
+    toast.error("Transaction cancelled by user.");
+  } else if (errorMessage.includes("insufficient")) {
+    toast.error("Insufficient XLM balance.");
+  } else if (
+    errorMessage.includes("destination") ||
+    errorMessage.includes("not found")
+  ) {
+    toast.error("Receiver account not found.");
+  } else if (errorMessage.includes("network")) {
+    toast.error("Network error. Please try again.");
+  } else {
+    toast.error("Transaction failed.");
+  }
+
+  setMessage("❌ Transaction Failed");
+}
+finally {
+  setLoading(false);
+} 
         }}
-        className={`px-6 py-3 rounded text-white w-full ${
-          loading
-            ? "bg-gray-600 cursor-not-allowed"
-            : "bg-green-600 hover:bg-green-700"
-        }`}
+        className={`w-full py-3 rounded-xl font-semibold text-white transition-all duration-300 ${
+  loading
+    ? "bg-gray-600 cursor-not-allowed"
+    : "bg-gradient-to-r from-cyan-500 to-blue-600 hover:scale-[1.02] hover:shadow-xl"
+}`}
       >
         {loading ? (
           <div className="flex items-center justify-center gap-2">

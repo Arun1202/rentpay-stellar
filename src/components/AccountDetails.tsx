@@ -26,7 +26,7 @@ export default function AccountDetails({ address }: Props) {
   if (!address || !account) return null;
 
   return (
-    <div className="bg-slate-800 p-6 rounded-xl h-full">
+    <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-xl h-full">
       <h2 className="text-2xl font-bold text-white mb-4">
         Account Details
       </h2>

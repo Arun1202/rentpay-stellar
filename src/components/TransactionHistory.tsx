@@ -57,7 +57,7 @@ setTotalReceived(received);
   if (!address) return null;
 
   return (
-    <div className="bg-slate-800 p-6 rounded-xl mt-8 w-full max-w-lg">
+    <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-xl mt-8 w-full max-w-lg">
       <h2 className="text-2xl font-bold text-white mb-4">
         Transaction History
       </h2>
@@ -102,10 +102,18 @@ setTotalReceived(received);
 </div>
 
       {transactions.length === 0 ? (
-        <p className="text-gray-400">
-          No transactions found.
-        </p>
-      ) : (
+  <div className="flex flex-col items-center justify-center py-12 text-center">
+    <div className="text-6xl mb-4">📭</div>
+
+          <h3 className="text-xl font-bold text-white">
+             No Transactions Yet
+           </h3>
+
+          <p className="text-gray-400 mt-2">
+        Your recent Stellar payments will appear here.
+       </p>
+          </div>
+          ) : (
         <div className="space-y-3">
           {transactions
    .filter((tx: any) => {
