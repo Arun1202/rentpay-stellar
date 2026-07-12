@@ -16,7 +16,6 @@ import { useState } from "react";
 
 export default function Hero() {
   const [showHistory, setShowHistory] = useState(false);
-  const [transactionCount, setTransactionCount] = useState(0);
 const {
   address,
   balance,
