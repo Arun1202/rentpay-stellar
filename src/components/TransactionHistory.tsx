@@ -12,6 +12,7 @@ export default function TransactionHistory({ address }: Props) {
   const [paymentCount, setPaymentCount] = useState(0);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
+  const [lastTransaction, setLastTransaction] = useState("");
   useEffect(() => {
     if (!address) return;
 
@@ -19,9 +20,14 @@ export default function TransactionHistory({ address }: Props) {
       try {
         const data = await getTransactionHistory(address);
         setTransactions(data);
+        if (data.length > 0) {
+          setLastTransaction(
+          new Date(data[0].created_at).toLocaleString()
+        );
+        }
         let sent = 0;
-let received = 0;
-let count = 0;
+        let received = 0;
+        let count = 0;
 
 data.forEach((tx: any) => {
   if (tx.type !== "payment") return;
@@ -152,6 +158,31 @@ setTotalReceived(received);
 >
   View on Explorer
 </a>
+<div className="bg-slate-700 rounded-lg p-4 mb-5">
+  <h3 className="text-xl font-semibold text-white mb-3">
+    📊 Account Summary
+  </h3>
+
+  <p className="text-green-400">
+    💸 Total Sent: {totalSent.toFixed(2)} XLM
+  </p>
+
+  <p className="text-blue-400">
+    💰 Total Received: {totalReceived.toFixed(2)} XLM
+  </p>
+
+  <p className="text-yellow-400">
+    🔄 Total Payments: {paymentCount}
+  </p>
+
+  <p className="text-gray-300 mt-2">
+    🆕 Last Transaction:
+  </p>
+
+  <p className="text-white">
+    {lastTransaction || "No transactions"}
+  </p>
+</div>
             </div>
           ))}
         </div>
