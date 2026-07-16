@@ -1,5 +1,6 @@
 import { useState } from "react";
 import TransactionCard from "./TransactionCard";
+import { createPaymentRecord } from "../services/contract";
 import toast from "react-hot-toast";
 import {
   buildPaymentTransaction,
@@ -119,6 +120,46 @@ if (!amount || Number(amount) <= 0) {
             );
 
             setHash(result.hash);
+            toast.success("XLM Payment Successful!");
+
+setMessage("⏳ Recording payment on smart contract...");
+
+try {
+  const contractResult = await createPaymentRecord(
+    address,
+    receiver,
+    amount
+  );
+
+  console.log(
+    "Contract Transaction Hash:",
+    contractResult.hash
+  );
+
+  console.log(
+    "Payment ID:",
+    contractResult.paymentId
+  );
+
+  toast.success("Payment recorded on smart contract!");
+
+  setMessage(
+    "✅ Payment Successful & Recorded on Blockchain"
+  );
+} catch (contractError) {
+  console.error(
+    "Contract recording failed:",
+    contractError
+  );
+
+  toast.error(
+    "XLM sent, but smart contract recording failed."
+  );
+
+  setMessage(
+    "⚠️ XLM Payment Successful, Contract Record Failed"
+  );
+}
 
             toast.success("Payment Successful!");
             setMessage("✅ Payment Successful");
