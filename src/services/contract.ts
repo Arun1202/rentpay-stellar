@@ -77,15 +77,34 @@ export async function createPaymentRecord(
   ) as Transaction;
 
   // 7. Submit contract transaction
-  const response =
-    await rpcServer.sendTransaction(signedTransaction);
+ const response =
+  await rpcServer.sendTransaction(signedTransaction);
 
-  if (response.status === "ERROR") {
-    throw new Error("Contract transaction submission failed.");
-  }
+if (response.status === "ERROR") {
+  throw new Error("Contract transaction submission failed.");
+}
 
-  return {
-    hash: response.hash,
-    paymentId: paymentId.toString(),
-  };
+const transactionHash = response.hash;
+
+// Wait for the transaction to reach a final status
+let finalStatus = await rpcServer.getTransaction(transactionHash);
+
+while (finalStatus.status === "NOT_FOUND") {
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+
+  finalStatus =
+    await rpcServer.getTransaction(transactionHash);
+}
+
+if (finalStatus.status !== "SUCCESS") {
+  throw new Error(
+    `Contract transaction failed: ${finalStatus.status}`
+  );
+}
+
+return {
+  hash: transactionHash,
+  paymentId: paymentId.toString(),
+  status: "SUCCESS",
+};
 }
